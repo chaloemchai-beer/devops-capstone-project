@@ -1,19 +1,34 @@
-# Image to simulate Skills Network cloud environment
+# The Skills Network Cloud IDE uses Ubuntu 18.04 :(
 FROM ubuntu:18.04
 
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Add repository for Python 3.8
+# Add any tools that are needed
 RUN apt-get update && \
-    apt-get install -y software-properties-common dirmngr apt-transport-https lsb-release ca-certificates && \
-    add-apt-repository -y ppa:deadsnakes/ppa
+    apt-get install -y sudo \
+        vim \
+        make \
+        git \
+        zip \
+        tree \
+        curl \
+        wget \
+        jq \
+        software-properties-common \
+        python3-pip \
+        python3-dev
 
-# Add tools and Python 3.8
-RUN apt-get update && \
-    apt-get install -y sudo vim git zip tree curl wget python3.8-dev python3-pip && \
-    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1 && \
-    apt-get autoremove -y && \
-    apt-get clean -y
+# Installing K3D for local Kubernetes development
+RUN curl -s "https://raw.githubusercontent.com/rancher/k3d/main/install.sh" | sudo bash
+
+# Installing Tekton CLI
+RUN curl -LO https://github.com/tektoncd/cli/releases/download/v0.18.0/tkn_0.18.0_Linux_x86_64.tar.gz && \
+    tar xvzf tkn_0.18.0_Linux_x86_64.tar.gz -C /usr/local/bin/ tkn && \
+    ln -s /usr/local/bin/tkn /usr/bin/tkn
+
+# Install OpenShift CLI
+RUN curl -LO https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz && \
+    tar xvzf openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz && \
+    install openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/oc /usr/local/bin/oc && \
+    ln -s /usr/local/bin/oc /usr/bin/oc
 
 # Create a user for development
 ARG USERNAME=theia
@@ -28,14 +43,14 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
 # Set up the Python development environment
-WORKDIR /project
-RUN python3 -m pip install --upgrade pip && \
-    pip3 install --upgrade wheel
+WORKDIR /home/project
+RUN python3 -m pip install --upgrade pip wheel
+
+ENV PORT 8000
+EXPOSE $PORT
 
 # Enable color terminal for docker exec bash
 ENV TERM=xterm-256color
 
-EXPOSE 8000
-
-# Become a regular user for development
+# Become a regular user
 USER $USERNAME
