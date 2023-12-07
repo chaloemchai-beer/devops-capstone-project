@@ -1,6 +1,6 @@
-# TDD / BDD Final Project Template
+# devops-capstone-project
 
-This repository contains the template to be used for the Final Project for the Coursera course **Introduction to TDD/BDD**.
+This repository contains the template to be used for the Final Project for the Coursera course **devops-capstone-project**.
 
 ## Usage
 
@@ -8,7 +8,7 @@ This repository is to be used as a template to create your own repository in you
 
 From the GitHub **Code** page, press the green **Use this template** button to create your own repository from this template. 
 
-Name your repo: `tdd-bdd-final-project`.
+Name your repo: `devops-capstone-project`.
 
 ## Setup
 
